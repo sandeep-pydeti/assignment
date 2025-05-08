@@ -1,0 +1,43 @@
+spring:
+  datasource:
+      url: jdbc:postgresql://localhost:5433/postgres
+      username: postgres
+      password: 123456
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    defer-datasource-initialization: true
+    hibernate.ddl-auto: update
+    generate-ddl: true
+    show-sql: true
+  kafka:
+    enabled: true
+    consumer:
+      topics: user-events
+      bootstrap-servers: localhost:9092
+      group-id: assignment
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      properties:
+        retry.backoff.ms: 5000
+        max.block.ms: 60000
+    listener:
+      ack-mode: manual
+      missing-topics-fatal: false
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      retries: 10
+      properties:
+        retry.backoff.ms: 5000
+        max.block.ms: 60000
+
+security:
+  require-ssl: true
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+

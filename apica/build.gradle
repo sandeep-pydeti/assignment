@@ -1,0 +1,62 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.5'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.assignment'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'org.postgresql:postgresql'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'org.postgresql:postgresql'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.1.0'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation('org.springframework.boot:spring-boot-starter-log4j2') {
+		exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl'
+	}
+	implementation group: 'org.apache.poi', name: 'poi', version: '5.2.4'
+	implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.2.4'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'com.h2database:h2'
+	implementation 'org.json:json:20230618'
+	implementation group: 'org.springframework.kafka', name: 'spring-kafka', version: '3.3.2'
+	implementation group: 'org.apache.kafka', name: 'kafka_2.13', version: '3.9.0'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '3.4.1'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
