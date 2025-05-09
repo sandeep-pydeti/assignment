@@ -2,6 +2,7 @@ package com.assignment.apica.controller;
 
 import com.assignment.apica.controllers.usercontroller;
 import com.assignment.apica.dto.UserDto;
+import com.assignment.apica.exception.CustomException;
 import com.assignment.apica.service.Implementation.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -20,7 +25,9 @@ import java.util.List;
 
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -50,8 +57,8 @@ class UserControllerTest {
                         .content(json))
                 .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("registered successfully"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.fullName").value("user1"));
+                .andExpect(jsonPath("$.message").value("registered successfully"))
+                .andExpect(jsonPath("$.data.fullName").value("user1"));
     }
 
     @Test
@@ -67,12 +74,12 @@ class UserControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/apica/user/getUser/{userId}", userId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("success"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("registered successfully"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.fullName").value("user1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value("user1@email.com"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.username").value("user11"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.phoneNumber").value("1234567890"));
+                .andExpect(jsonPath("$.message").value("success"))
+                .andExpect(jsonPath("$.message").value("registered successfully"))
+                .andExpect(jsonPath("$.data.fullName").value("user1"))
+                .andExpect(jsonPath("$.data.email").value("user1@email.com"))
+                .andExpect(jsonPath("$.data.username").value("user11"))
+                .andExpect(jsonPath("$.data.phoneNumber").value("1234567890"));
 
     }
 
@@ -84,8 +91,8 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("User not found"));
+                .andExpect(jsonPath("$.status").value(HttpStatus.INTERNAL_SERVER_ERROR.value()))
+                .andExpect(jsonPath("$.message").value("User not found"));
     }
 
     @Test
@@ -108,14 +115,13 @@ class UserControllerTest {
         when(userService.getAllUsers()).thenReturn(users);
         mockMvc.perform(get("/apica/user/getAllUsers")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print()) // Log request/response for debugging
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(HttpStatus.OK.value()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Success"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].fullName").value("user1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].email").value("user1@email.com"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].fullName").value("user2"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].email").value("user2@email.com"));
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value("Success"))
+                .andExpect(jsonPath("$.data[0].fullName").value("user1"))
+                .andExpect(jsonPath("$.data[0].email").value("user1@email.com"))
+                .andExpect(jsonPath("$.data[1].fullName").value("user2"))
+                .andExpect(jsonPath("$.data[1].email").value("user2@email.com"));
     }
 
     @Test
@@ -123,9 +129,45 @@ class UserControllerTest {
         when(userService.getAllUsers()).thenThrow(new RuntimeException("Database error"));
         mockMvc.perform(get("/apica/user/getAllUsers")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isInternalServerError())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+                .andExpect(jsonPath("$.status").value(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+    }
+
+    @Test
+    void testUpdateUser() throws Exception {
+        String userId = "123";
+        UserDto existiing = new UserDto();
+        existiing.setFullName("user1");
+        UserDto updated = new UserDto();
+        updated.setFullName("user2");
+        when(userService.updateUsers(eq(userId), any(UserDto.class))).thenReturn(updated);
+        String jsonPayload = new ObjectMapper().writeValueAsString(existiing);
+        mockMvc.perform(put("/apica/update/Users")
+                        .param("userId", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonPayload))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("updated successfully"))
+                .andExpect(jsonPath("$.data.fullName").value("updated"));
+    }
+
+
+    @Test
+    void testUpdateUser_UserNotFound() throws Exception {
+        String userId = "9999";
+        UserDto existiing = new UserDto();
+        existiing.setFullName("user1");
+        UserDto updated = new UserDto();
+        updated.setFullName("user2");
+        String jsonPayload = new ObjectMapper().writeValueAsString(existiing);
+        when(userService.updateUsers(eq(userId), any(UserDto.class)))
+                .thenThrow(new CustomException(HttpStatus.NOT_FOUND, "User not found"));
+
+        mockMvc.perform(put("/apica/update/Users")
+                        .param("userId", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonPayload))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value("UserId not found"));
     }
 }
-
