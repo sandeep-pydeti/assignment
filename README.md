@@ -69,3 +69,17 @@ Jouneral service
 --header 'Content-Type: application/json'
 3- To delete event curl --location --request DELETE 'http://localhost:9005/apica/delete/Events?userId=26ff651d-83b4-4e56-a9e3-f7ef3aaeac2d' \
 --header 'Content-Type: application/json'
+
+To run the docker file 
+In terminal give (ip a) to get private ip 
+place the ip address in application-local.yml in database connection instead of local host and give ip address and as same kafka aslo
+If you running kafka in local and zookeeper as broker run these commands
+To start kakfka server :bin/kafka-server-start.sh config/server.properties
+To start zookeeper :bin/zookeeper-server-start.sh config/zookeeper.properties
+if kafka is running through docker then ,run the kafka image  
+first the build the image:  sudo docker build -t journal .
+run the application sudo docker run -d -p 9005:9005 journal
+and check the logs with the container Id 
+
+
+
