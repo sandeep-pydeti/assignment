@@ -1,9 +1,10 @@
 This is a application demonstrating a REST API service integrated with a PostgreSQL database and Kafka for event-driven communication. The system is designed to be scalable, containerized, and easy to deploy locally using Docker Compose.
 
-Docker Compose: Used for simplified local development.
-PostgreSQL: Chosen as the primary database 
-Kafka: Used for asynchronous messaging in between microservices.
-REST API: Built with a lightweight framework (springboot) for simplicity and performance.
+Technology Stack
+Spring Boot: Used to develop the REST APIs.
+PostgreSQL: Primary relational database.
+Kafka: For asynchronous communication between microservices.
+Docker & Docker Compose: Simplifies containerization and local setup.
 
 Prerequisites:
 Docker: Install Docker Desktop (or Docker CLI for Linux) to run containers.
@@ -70,16 +71,23 @@ Jouneral service
 3- To delete event curl --location --request DELETE 'http://localhost:9005/apica/delete/Events?userId=26ff651d-83b4-4e56-a9e3-f7ef3aaeac2d' \
 --header 'Content-Type: application/json'
 
-To run the docker file 
-In terminal give (ip a) to get private ip 
-place the ip address in application-local.yml in database connection instead of local host and give ip address and as same kafka aslo
-If you running kafka in local and zookeeper as broker run these commands
-To start kakfka server :bin/kafka-server-start.sh config/server.properties
-To start zookeeper :bin/zookeeper-server-start.sh config/zookeeper.properties
-if kafka is running through docker then ,run the kafka image  
-first the build the image:  sudo docker build -t journal .
-run the application sudo docker run -d -p 9005:9005 journal
-and check the logs with the container Id 
+Running with Docker
+1. Get Your Local IP Address
+Run ip a and identify your private IP.
+2. Update Configuration
+Replace localhost in your application-local.yml with your private IP for both the PostgreSQL and Kafka configuration.
+3. If Running Kafka Locally
+Start Zookeeper:
+bin/zookeeper-server-start.sh config/zookeeper.properties
+Start Kafka:
+bin/kafka-server-start.sh config/server.properties
+4. If Running Kafka with Docker
+Build the journal image:
+sudo docker build -t journal .
+Run the container:
+sudo docker run -d -p 9005:9005 journal
+View container logs:
+sudo docker logs <container_id>
 
 
 
